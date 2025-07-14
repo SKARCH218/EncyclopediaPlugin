@@ -30,8 +30,8 @@
   left-click-commands:
     - "playsound minecraft:entity.experience_orb.pickup master {player}"
   right-click-commands:
-    - "say {player}이(가) 동전을 던졌습니다!;tellraw {player} [{"text":"[결과] ","color":"gold"},{"text":"앞면!","color":"white"}]"
-    - "say {player}이(가) 동전을 던졌습니다!;tellraw {player} [{"text":"[결과] ","color":"gold"},{"text":"뒷면!","color":"white"}]"
+    - "say {player}이(가) 동전을 던졌습니다! (앞면)"
+    - "say {player}이(가) 동전을 던졌습니다! (뒷면)"
 
 120:
   name: "§c§l신비로운 왕관"
