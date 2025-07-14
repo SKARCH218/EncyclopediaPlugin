@@ -1,0 +1,39 @@
+# Encyclopedia Plugin - Language File (언어 파일)
+
+# 명령어 관련 메시지
+command:
+  player_only: "&c플레이어만 사용 가능한 명령어입니다."
+  no_permission: "&c권한이 없습니다."
+  unknown_command: "&c알 수 없는 명령어입니다."
+  reload_success: "&a도감 플러그인의 모든 설정(config.yml, items.yml, lang.yml)을 리로드했습니다."
+  ranking_header: "&e========== [ 도감 수집 랭킹 (페이지: {page} / {max_page}) ] =========="
+  ranking_format: "&6{rank}위. &f{player} &7- &e{count}개"
+
+# 도감 GUI 관련 메시지
+gui:
+  relic_uncollected: "&c등록되지 않음"
+  relic_id: "&7ID: {id}"
+  progress: "&e진행도: &f{collected} / {max}"
+  filter_all: "&f전체보기"
+  filter_normal: "&9일반"
+  filter_rare: "&a고급"
+  filter_legendary: "&6전설"
+  filter_selected: "&a(선택됨)"
+  page_prev: "&a◀ 이전 페이지"
+  page_next: "&a▶ 다음 페이지"
+
+# 시스템 메시지
+system:
+  relic_acquired: "&a[도감] {relic_name}&a을(를) 획득하여 도감에 등록했습니다!"
+  collection_complete_broadcast: "&a[도감] &e{player}&a님이 도감을 전부 채웠습니다!"
+  collection_complete_title: "&6&l도감 완성!"
+  collection_complete_subtitle: "&a모든 유물을 수집했습니다!"
+
+# 관리자 명령어 관련 메시지
+admin:
+  usage: "&a/eadmin <subcommand> [args]"
+  player_not_found: "&c플레이어를 찾을 수 없습니다."
+  invalid_relic_id: "&c올바른 유물 번호를 입력하세요. (1-{max_id})"
+  check_usage: "&c/eadmin 확인 <플레이어> [페이지]"
+  reset_usage: "&c/eadmin 초기화 <플레이어>"
+  reset_success: "&a{player}님의 도감 정보를 초기화했습니다."

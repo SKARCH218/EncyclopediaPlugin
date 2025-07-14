@@ -1,0 +1,20 @@
+name: Encyclopedia_Plugin
+version: 1.0-SNAPSHOT
+main: lightstudio.encyclopedia.EncyclopediaPlugin
+api-version: '1.21'
+commands:
+  도감:
+    description: 도감을 엽니다.
+    usage: /도감
+  도감랭킹:
+    description: 도감 수집 랭킹을 확인합니다.
+    usage: /도감랭킹 [페이지]
+  eadmin:
+    description: 도감 관리 명령어입니다.
+    usage: /eadmin <subcommand> [args]
+    permission: op
+depend: [LuckPerms]
+commands:
+  도감:
+    description: 도감을 엽니다.
+    usage: /도감
