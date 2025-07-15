@@ -28,12 +28,18 @@ system:
   collection_complete_broadcast: "&a[도감] &e{player}&a님이 도감을 전부 채웠습니다!"
   collection_complete_title: "&6&l도감 완성!"
   collection_complete_subtitle: "&a모든 유물을 수집했습니다!"
+  relic_removed_from_book: "&a[도감] {relic_name}&a을(를) 도감에서 꺼냈습니다!"
+  inventory_full: "&c인벤토리가 가득 찼습니다!"
+  relic_registered: "&a[도감] {relic_name}&a이(가) 도감에 등록되었습니다!"
+  relic_already_registered: "&c[도감] 이미 도감에 등록된 유물입니다."
 
 # 관리자 명령어 관련 메시지
 admin:
-  usage: "&a/eadmin <subcommand> [args]"
+  usage: "&a/도감관리 <subcommand> [args]"
   player_not_found: "&c플레이어를 찾을 수 없습니다."
   invalid_relic_id: "&c올바른 유물 번호를 입력하세요. (1-{max_id})"
-  check_usage: "&c/eadmin 확인 <플레이어> [페이지]"
-  reset_usage: "&c/eadmin 초기화 <플레이어>"
+  check_usage: "&c/도감관리 확인 <플레이어> [페이지]"
+  reset_usage: "&c/도감관리 초기화 <플레이어>"
   reset_success: "&a{player}님의 도감 정보를 초기화했습니다."
+  give_relic_usage: "&c/도감관리 유물 <유물번호>"
+  relic_given: "&a{id}번 유물을 지급받았습니다."
