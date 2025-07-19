@@ -32,7 +32,7 @@ data class RankingEntry(val uuid: UUID, val name: String, val count: Int)
 class EncyclopediaPlugin : JavaPlugin(), Listener, TabExecutor {
 
     val maxId = 120
-    private val itemsPerPage = 36
+    private val itemsPerPage = 40
     private val encyclopediaData = mutableMapOf<UUID, MutableSet<Int>>()
     private val cumulativeData = mutableMapOf<UUID, Int>()
     private val relicRegistry = mutableMapOf<Int, Relic>()
@@ -69,6 +69,7 @@ class EncyclopediaPlugin : JavaPlugin(), Listener, TabExecutor {
 
     private fun reloadAllConfigs() {
         saveDefaultConfig()
+        reloadConfig()
         createItemsConfig()
         createLangConfig()
         loadRelics()
@@ -251,10 +252,19 @@ class EncyclopediaPlugin : JavaPlugin(), Listener, TabExecutor {
         val endIdx = (startIdx + itemsPerPage - 1).coerceAtMost(filteredRelics.size - 1)
 
         if (startIdx <= endIdx) {
+            var itemIndex = 0
             for (i in startIdx..endIdx) {
                 val relicId = filteredRelics[i]
                 val isCollected = encyclopediaData[targetUUID]?.contains(relicId) == true
-                inv.setItem(i - startIdx, getItem(relicId, isCollected))
+                
+                val row = itemIndex / 8
+                val col = itemIndex % 8
+                val slot = row * 9 + if (col >= 4) col + 1 else col
+
+                if (slot < 45) { // 5번째 줄까지만 배치
+                    inv.setItem(slot, getItem(relicId, isCollected))
+                }
+                itemIndex++
             }
         }
 
@@ -304,51 +314,69 @@ class EncyclopediaPlugin : JavaPlugin(), Listener, TabExecutor {
     fun onInventoryClick(e: InventoryClickEvent) {
         val player = e.whoClicked as? Player ?: return
         val invTitle = e.view.title
-        val allTitle = config.getString("gui-titles.all", ":offset_-13::encyclopedia_all:") ?: ""
-        val normalTitle = config.getString("gui-titles.normal", ":offset_-13::encyclopedia_normal:") ?: ""
-        val rareTitle = config.getString("gui-titles.rare", ":offset_-13::encyclopedia_rare:") ?: ""
-        val legendaryTitle = config.getString("gui-titles.legendary", ":offset_-13::encyclopedia_legendary:") ?: ""
 
-        if (!invTitle.startsWith(allTitle) && !invTitle.startsWith(normalTitle) && !invTitle.startsWith(rareTitle) && !invTitle.startsWith(legendaryTitle)) return
+        val allTitle = config.getString("gui-titles.all")
+        val normalTitle = config.getString("gui-titles.normal")
+        val rareTitle = config.getString("gui-titles.rare")
+        val legendaryTitle = config.getString("gui-titles.legendary")
+
+        if (listOf(allTitle, normalTitle, rareTitle, legendaryTitle).none { it != null && invTitle.startsWith(it) }) return
 
         e.isCancelled = true
-        val clickedItem = e.currentItem ?: return
-        if (clickedItem.type == Material.AIR) return
 
         val targetName = invTitle.substringAfter("§8- ").substringBefore(" (")
         val targetUUID = Bukkit.getOfflinePlayer(targetName).uniqueId
-        
-        val pageRegex = "§e(\\d+)§8/§e(\\d+)".toRegex()
+
+        val pageRegex = """§e(\d+)§8/§e(\d+)""".toRegex()
         val matchResult = pageRegex.find(invTitle)
         val currentPage = matchResult?.groups?.get(1)?.value?.toIntOrNull() ?: 1
 
         when (e.rawSlot) {
-            in 0 until itemsPerPage -> { // 유물 아이템 슬롯 클릭
-                val relicId = clickedItem.itemMeta?.customModelData ?: return
-                val relic = relicRegistry[relicId] ?: return
-
-                // 자신의 도감을 보고 있을 때
-                if (player.uniqueId == targetUUID) {
-                    if (encyclopediaData[player.uniqueId]?.contains(relicId) == true) { // 수집된 유물 클릭 (꺼내기)
-                        // 우클릭 시에만 꺼내기
-                        if (e.click == ClickType.RIGHT) {
-                            val itemToGive = getItem(relicId, true) // 꺼낼 아이템 생성
-                            if (player.inventory.firstEmpty() != -1) {
-                                player.inventory.addItem(itemToGive)
-                                player.sendMessage(getMessage("system.relic_removed_from_book", mapOf("relic_name" to relic.name)))
-                                encyclopediaData[player.uniqueId]?.remove(relicId) // 도감에서 제거
-                                openGUI(player, currentPage, targetUUID) // GUI 새로고침
-                            } 
-                        } 
-                    } 
-                } 
-            }
             45 -> openGUI(player, currentPage - 1, targetUUID)
             53 -> openGUI(player, currentPage + 1, targetUUID)
-            47 -> { playerFilters[player.uniqueId] = GradeFilter.ALL; openGUI(player, 1, targetUUID) }
-            48 -> { playerFilters[player.uniqueId] = GradeFilter.NORMAL; openGUI(player, 1, targetUUID) }
-            50 -> { playerFilters[player.uniqueId] = GradeFilter.RARE; openGUI(player, 1, targetUUID) }
-            51 -> { playerFilters[player.uniqueId] = GradeFilter.LEGENDARY; openGUI(player, 1, targetUUID) }
+            47 -> {
+                playerFilters[player.uniqueId] = GradeFilter.ALL
+                openGUI(player, 1, targetUUID)
+            }
+            48 -> {
+                playerFilters[player.uniqueId] = GradeFilter.NORMAL
+                openGUI(player, 1, targetUUID)
+            }
+            50 -> {
+                playerFilters[player.uniqueId] = GradeFilter.RARE
+                openGUI(player, 1, targetUUID)
+            }
+            51 -> {
+                playerFilters[player.uniqueId] = GradeFilter.LEGENDARY
+                openGUI(player, 1, targetUUID)
+            }
+            else -> {
+                if (e.rawSlot in 0..53 && e.rawSlot % 9 != 4) {
+                    val clickedItem = e.currentItem ?: return
+                    if (clickedItem.type == Material.AIR) return
+
+                    val relicId = clickedItem.itemMeta?.customModelData ?: return
+                    val relic = relicRegistry[relicId] ?: return
+
+                    if (player.uniqueId == targetUUID) {
+                        if (encyclopediaData[player.uniqueId]?.contains(relicId) == true) {
+                            if (e.click == ClickType.RIGHT) {
+                                val itemToGive = getItem(relicId, true)
+                                if (player.inventory.firstEmpty() != -1) {
+                                    player.inventory.addItem(itemToGive)
+                                    player.sendMessage(getMessage("system.relic_removed_from_book", mapOf("relic_name" to relic.name)))
+                                    encyclopediaData[player.uniqueId]?.remove(relicId)
+                                    openGUI(player, currentPage, targetUUID)
+                                }
+                            }
+                        } else {
+                            if (e.click == ClickType.RIGHT) {
+                                player.sendMessage("§c아직 등록되지 않은 유물입니다.")
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
